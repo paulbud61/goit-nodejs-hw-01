@@ -1,38 +1,63 @@
-const { Command } = require("commander");
-const program = new Command();
-program
-  .option("-a, --action <type>", "choose action")
-  .option("-i, --id <type>", "user id")
-  .option("-n, --name <type>", "user name")
-  .option("-e, --email <type>", "user email")
-  .option("-p, --phone <type>", "user phone");
+const {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+} = require("./contacts");
+const yargs = require("yargs");
 
-program.parse(process.argv);
+const argv = yargs
+  .command("list", "List all contacts")
+  .command("get", "Get contact by id", {
+    id: {
+      describe: "Contact ID",
+      demandOption: true,
+      type: "string",
+    },
+  })
+  .command("add", "Add a new contact", {
+    name: {
+      describe: "Contact name",
+      demandOption: true,
+      type: "string",
+    },
+    email: {
+      describe: "Contact email",
+      demandOption: true,
+      type: "string",
+    },
+    phone: {
+      describe: "Contact phone",
+      demandOption: true,
+      type: "string",
+    },
+  })
+  .command("remove", "Remove a contact by id", {
+    id: {
+      describe: "Contact ID",
+      demandOption: true,
+      type: "string",
+    },
+  })
+  .help().argv;
 
-const argv = program.opts();
-
-// TODO: refactorizare
-function invokeAction({ action, id, name, email, phone }) {
+const invokeAction = async ({ action, id, name, email, phone }) => {
   switch (action) {
     case "list":
-      // ...
+      await listContacts();
       break;
-
     case "get":
-      // ... id
+      await getContactById(id);
       break;
-
     case "add":
-      // ... name email phone
+      await addContact(name, email, phone);
       break;
-
     case "remove":
-      // ... id
+      await removeContact(id);
       break;
-
     default:
       console.warn("\x1B[31m Unknown action type!");
   }
-}
+};
 
 invokeAction(argv);
